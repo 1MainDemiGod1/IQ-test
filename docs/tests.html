@@ -7,10 +7,22 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
-  <h1>Выберите тест</h1>
-  <div class="test-choice">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+    <img src="favicon.svg" alt="IQ" style="width:64px;height:64px;margin-bottom:8px;filter:drop-shadow(0 2px 8px #b6aee7);">
+    <h1>Выберите тест</h1>
+  </div>
+  <div class="test-choice" style="flex-wrap:wrap;gap:24px;justify-content:center;">
     <a href="/test" class="test-btn">IQ-тест</a>
-    <a href="#" class="test-btn disabled">Другой тест (скоро)</a>
+    <a href="/test-math" class="test-btn">Практикум по решению математических задач</a>
+    <a href="/test-analysis" class="test-btn">Комплексный анализ</a>
+    <a href="/test-db" class="test-btn">Основы проектирования ИС и БД</a>
+    <a href="/test-numerical" class="test-btn">Методы вычислений</a>
+    <a href="/test-physmath" class="test-btn">Уравнения математической физики</a>
+    <a href="/test-softdev" class="test-btn">Технология разработки ПО</a>
+    <a href="/test-modeling" class="test-btn">Математическое моделирование и анализ данных</a>
+    <a href="/test-infoman" class="test-btn">Информационный менеджмент</a>
+    <a href="/test-worldinfo" class="test-btn">Мировые информационные ресурсы</a>
+    <a href="/test-control" class="test-btn">Теория управления</a>
   </div>
   <a href="/logout" class="logout-btn">Выйти из аккаунта</a>
 </body>
