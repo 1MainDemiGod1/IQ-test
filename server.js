@@ -248,7 +248,7 @@ app.post('/submit', (req, res) => {
 
 app.get('/result', (req, res) => {
   if (!req.session.userId) return res.redirect('/');
-  res.send(`<h2>Результат отправлен на вашу почту.</h2><a href="/test">Пройти снова</a> | <a href="/logout">Выйти</a>`);
+  res.sendFile(path.join(__dirname, 'path/to/results.html')); // Убедитесь, что путь правильный
 });
 
 app.get('/logout', (req, res) => {
@@ -270,8 +270,7 @@ app.get('/tests', (req, res) => {
 // Маршрут для страницы результатов
 app.post('/submit-test', (req, res) => {
     // Логика обработки теста
-    // После обработки отправьте пользователя на страницу результатов
-    res.sendFile(path.join(__dirname, 'path/to/results.html')); // Укажите путь к вашему HTML-файлу с результатами
+    res.sendFile(path.join(__dirname, 'path/to/results.html')); // Убедитесь, что путь правильный
 });
 
 const PORT = process.env.PORT || 3000;
