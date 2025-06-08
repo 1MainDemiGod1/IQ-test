@@ -2,19 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Прохождение теста</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>IQ-Тест</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1 id="test-title">Тест</h1>
-    <button onclick="window.location.href='index.html'">На главную</button>
-  </header>
-  <main>
-    <form id="test-form"></form>
-    <button id="finish-test" style="display:none;">Завершить тест</button>
-  </main>
-  <script src="scripts/test.js"></script>
+  <h1>IQ-Тест</h1>
+  <form id="testForm" method="post" action="/submit">
+    <div id="questions"></div>
+    <button type="submit">Завершить тест</button>
+  </form>
+  <script src="test.js"></script>
 </body>
 </html> 
