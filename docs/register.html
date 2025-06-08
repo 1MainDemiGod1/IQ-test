@@ -9,6 +9,7 @@
   <h1>Регистрация</h1>
   <div class="form-container">
     <form action="/register" method="post">
+      <div id="register-error" style="display:none; text-align:center; color:#d32f2f; font-weight:700; margin-bottom:14px; font-size:1.05rem;"></div>
       <h2>Регистрация</h2>
       <input type="text" name="lastname" placeholder="Фамилия" required><br>
       <input type="text" name="firstname" placeholder="Имя" required><br>
@@ -20,5 +21,13 @@
       <p class="form-link">Уже есть аккаунт? <a href="index.html">Войти</a></p>
     </form>
   </div>
+  <script>
+    // Показываем ошибку, если есть error в query
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('error')) {
+      document.getElementById('register-error').textContent = decodeURIComponent(params.get('error').replace(/\+/g, ' '));
+      document.getElementById('register-error').style.display = 'block';
+    }
+  </script>
 </body>
 </html> 

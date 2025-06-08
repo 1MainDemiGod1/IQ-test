@@ -61,14 +61,18 @@ app.get('/', (req, res) => {
 app.post('/register', (req, res) => {
   const { username, password, email, lastname, firstname, middlename } = req.body;
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return res.send('Некорректный email. <a href="/">Назад</a>');
+    return res.redirect('/register.html?error=Некорректный+email');
   }
-  db.run('INSERT INTO users (username, password, email, lastname, firstname, middlename) VALUES (?, ?, ?, ?, ?, ?)', [username, password, email, lastname, firstname, middlename], function(err) {
-    if (err) {
-      return res.send('Ошибка: пользователь уже существует или данные некорректны. <a href="/">Назад</a>');
+  db.get('SELECT id FROM users WHERE email = ?', [email], (err, row) => {
+    if (row) {
+      return res.redirect('/register.html?error=Пользователь+с+таким+email+уже+существует');
     }
-    req.session.userId = this.lastID;
-    res.redirect('/test');
+    db.run('INSERT INTO users (username, password, email, lastname, firstname, middlename) VALUES (?, ?, ?, ?, ?, ?)', [username, password, email, lastname, firstname, middlename], function(err) {
+      if (err) {
+        return res.redirect('/register.html?error=Пользователь+с+таким+логином+уже+существует');
+      }
+      res.redirect('/index.html?registered=1');
+    });
   });
 });
 
@@ -80,7 +84,7 @@ app.post('/login', (req, res) => {
       req.session.userId = row.id;
       res.redirect('/tests.html');
     } else {
-      res.send('Неверный логин или пароль. <a href="/">Назад</a>');
+      res.redirect('/index.html?error=Неверный+логин+или+пароль');
     }
   });
 });
