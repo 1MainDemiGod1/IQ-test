@@ -24,7 +24,7 @@ form {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   min-width: 260px;
 }
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], input[type="email"] {
   width: 100%;
   padding: 8px;
   margin: 8px 0;
