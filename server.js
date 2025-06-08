@@ -8,7 +8,7 @@ const app = express();
 const db = new sqlite3.Database('./iqtest.db');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static('docs'));
 app.use(session({
   secret: 'iqtest_secret',
   resave: false,
@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
   if (req.session.userId) {
     res.redirect('/test');
   } else {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'docs', 'index.html'));
   }
 });
 
@@ -89,7 +89,7 @@ const questions = [
 
 app.get('/test', (req, res) => {
   if (!req.session.userId) return res.redirect('/');
-  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 app.post('/submit', (req, res) => {
