@@ -78,7 +78,7 @@ app.post('/login', (req, res) => {
   db.get('SELECT id FROM users WHERE username = ? AND password = ?', [username, password], (err, row) => {
     if (row) {
       req.session.userId = row.id;
-      res.redirect('/test');
+      res.redirect('/tests.html');
     } else {
       res.send('Неверный логин или пароль. <a href="/">Назад</a>');
     }

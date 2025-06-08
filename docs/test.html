@@ -11,6 +11,18 @@
     <div id="questions"></div>
     <button type="submit">Завершить тест</button>
   </form>
+  <div id="test-complete" style="display:none; text-align:center; margin-top:40px;">
+    <h2>Тест завершён!</h2>
+    <p>Ваш результат отправлен на вашу почту.</p>
+    <a href="/tests.html" class="test-btn">К выбору теста</a>
+  </div>
   <script src="test.js"></script>
+  <script>
+    // Показывать красивое сообщение после завершения теста
+    if (window.location.pathname === '/result') {
+      document.getElementById('testForm').style.display = 'none';
+      document.getElementById('test-complete').style.display = 'block';
+    }
+  </script>
 </body>
 </html> 
