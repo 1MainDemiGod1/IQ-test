@@ -2,26 +2,26 @@
 
 body {
   font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
-  background: linear-gradient(135deg, #e0e7ff 0%, #fbc2eb 100%);
+  background: linear-gradient(135deg, #e3e6f3 0%, #f7e9f7 100%);
   min-height: 100vh;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f4f4f4;
-  color: #333;
+  background-color: #f7f7fa;
+  color: #2d2d2d;
   text-align: center;
   padding: 50px;
 }
 h1 {
   margin-top: 40px;
-  color: #333;
+  color: #2d2d2d;
   font-family: 'Montserrat', Arial, sans-serif;
   font-weight: 900;
-  font-size: 2.7rem;
+  font-size: 2.5rem;
   letter-spacing: 2px;
-  text-shadow: 0 4px 16px rgba(80,80,120,0.10), 0 1px 0 #fff;
+  text-shadow: 0 2px 8px rgba(80,80,120,0.08), 0 1px 0 #fff;
   text-align: center;
   margin-bottom: 18px;
 }
@@ -32,9 +32,9 @@ h1 {
   animation: fadeIn 0.7s;
   justify-content: center;
   align-items: flex-start;
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.98);
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(80,80,120,0.10);
+  box-shadow: 0 4px 24px rgba(80,80,120,0.08);
   padding: 32px 40px 32px 40px;
 }
 form {
@@ -49,38 +49,40 @@ input[type="text"], input[type="password"], input[type="email"] {
   width: 100%;
   padding: 12px 14px;
   margin: 12px 0;
-  border: 1.5px solid #b3b3b3;
-  border-radius: 6px;
+  border: 1.5px solid #c7c7d9;
+  border-radius: 8px;
   font-size: 1.08rem;
   font-family: 'Roboto', Arial, sans-serif;
-  background: #f7f8fa;
+  background: #f9f9fc;
   transition: box-shadow 0.2s, border 0.2s;
 }
 input:focus, button:focus {
-  box-shadow: 0 0 0 2px #4a90e2;
-  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px #7a8fd8;
+  border-color: #7a8fd8;
   outline: none;
 }
-button {
+button, .test-btn, .button {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(90deg, #4a90e2 0%, #8f6ed5 100%);
+  background: linear-gradient(90deg, #7a8fd8 0%, #b6aee7 100%);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1.15rem;
   font-family: 'Montserrat', Arial, sans-serif;
   font-weight: 700;
   cursor: pointer;
   margin-top: 12px;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.10);
+  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
   letter-spacing: 1px;
   transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
-button:hover {
-  background: linear-gradient(90deg, #357ab8 0%, #6d4bc3 100%);
+button:hover, .test-btn:hover, .button:hover {
+  background: linear-gradient(90deg, #5c6bc0 0%, #a18cd1 100%);
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 16px rgba(80,80,120,0.13);
+  box-shadow: 0 6px 16px rgba(80,80,120,0.10);
 }
 .test-choice {
   display: flex;
@@ -108,7 +110,7 @@ button:hover {
   box-shadow: 0 6px 16px rgba(80,80,120,0.13);
 }
 .test-btn.disabled {
-  background: #aaa;
+  background: #bbb;
   pointer-events: none;
   cursor: not-allowed;
 }
@@ -149,19 +151,19 @@ p, label, input, button, a {
   text-align: center;
   font-size: 1.08rem;
   font-weight: 700;
-  color: #6d4bc3;
+  color: #7a8fd8;
   margin-top: 14px;
   text-decoration: none;
   letter-spacing: 0.5px;
   transition: color 0.2s, text-decoration 0.2s;
 }
 .form-link a {
-  color: #4a90e2;
+  color: #5c6bc0;
   text-decoration: underline;
   transition: color 0.2s;
 }
 .form-link a:hover {
-  color: #357ab8;
+  color: #7a8fd8;
   text-decoration: underline wavy;
 }
 .logout-btn {
@@ -185,10 +187,10 @@ p, label, input, button, a {
   box-shadow: 0 6px 16px rgba(255,88,88,0.18);
   transform: translateY(-2px) scale(1.03);
 }
-.result-block {
-  background: rgba(255,255,255,0.97);
+.result-block, .form-container {
+  background: rgba(255,255,255,0.99);
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(80,80,120,0.13);
+  box-shadow: 0 4px 24px rgba(80,80,120,0.10);
   padding: 36px 32px 32px 32px;
   max-width: 420px;
   margin: 48px auto 0 auto;
@@ -206,7 +208,7 @@ p, label, input, button, a {
 }
 .result-message {
   font-size: 1.18rem;
-  color: #4a90e2;
+  color: #7a8fd8;
   font-weight: 700;
   margin-bottom: 18px;
   margin-top: 0;
@@ -214,7 +216,7 @@ p, label, input, button, a {
 }
 .question-slider {
   min-height: 220px;
-  max-width: 520px;
+  max-width: 600px;
   margin: 0 auto 18px auto;
   display: flex;
   align-items: center;
@@ -227,7 +229,7 @@ p, label, input, button, a {
 .question-title {
   font-size: 1.18rem;
   font-weight: 700;
-  color: #4a90e2;
+  color: #5c6bc0;
   margin-bottom: 18px;
   text-align: left;
   letter-spacing: 0.2px;
@@ -235,10 +237,14 @@ p, label, input, button, a {
   display: flex;
   align-items: center;
   gap: 12px;
+  background: #f0f2fa;
+  border-radius: 8px;
+  padding: 12px 18px;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.04);
 }
 .q-num {
-  background: #e0e7ff;
-  color: #6d4bc3;
+  background: #e3e6f3;
+  color: #7a8fd8;
   border-radius: 8px;
   padding: 2px 10px;
   font-size: 1rem;
@@ -248,29 +254,29 @@ p, label, input, button, a {
 .answers {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 10px;
 }
 .answer-label {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f7f8fa;
-  border-radius: 6px;
-  padding: 10px 14px;
+  background: #f7f7fa;
+  border-radius: 10px;
+  padding: 14px 18px;
   font-size: 1.08rem;
   font-weight: 500;
   cursor: pointer;
-  border: 1.5px solid #e0e7ff;
+  border: 1.5px solid #e3e6f3;
   transition: border 0.2s, box-shadow 0.2s, background 0.2s;
   box-shadow: 0 1px 4px rgba(80,80,120,0.04);
 }
 .answer-label:hover, .answer-label input:focus + span {
-  border-color: #4a90e2;
-  background: #e0e7ff;
+  border-color: #7a8fd8;
+  background: #e3e6f3;
 }
 .answer-label input[type="radio"] {
-  accent-color: #4a90e2;
+  accent-color: #7a8fd8;
   width: 18px;
   height: 18px;
 }
@@ -281,22 +287,22 @@ p, label, input, button, a {
   margin-top: 18px;
 }
 .slider-btn {
-  background: linear-gradient(90deg, #4a90e2 0%, #8f6ed5 100%);
+  background: linear-gradient(90deg, #7a8fd8 0%, #b6aee7 100%);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 1.08rem;
   font-weight: 700;
   padding: 10px 28px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(80,80,120,0.10);
+  box-shadow: 0 2px 8px rgba(80,80,120,0.08);
   letter-spacing: 1px;
   transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 .slider-btn:hover {
-  background: linear-gradient(90deg, #357ab8 0%, #6d4bc3 100%);
+  background: linear-gradient(90deg, #5c6bc0 0%, #a18cd1 100%);
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 16px rgba(80,80,120,0.13);
+  box-shadow: 0 6px 16px rgba(80,80,120,0.10);
 }
 .answers.shake {
   animation: shake 0.4s;
