@@ -4,16 +4,22 @@
   <meta charset="UTF-8">
   <title>IQ-Тест</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
   <h1>IQ-Тест</h1>
   <form id="testForm" method="post" action="/submit">
-    <div id="questions"></div>
-    <button type="submit">Завершить тест</button>
+    <div id="question-slider" class="question-slider"></div>
+    <div class="slider-controls">
+      <button type="button" id="prevBtn" class="slider-btn">Назад</button>
+      <button type="button" id="nextBtn" class="slider-btn">Далее</button>
+      <button type="submit" id="finishBtn" class="slider-btn" style="display:none;">Завершить тест</button>
+    </div>
   </form>
-  <div id="test-complete" style="display:none; text-align:center; margin-top:40px;">
+  <div id="test-complete" class="result-block" style="display:none; text-align:center; margin-top:40px;">
+    <div class="result-icon">📧</div>
     <h2>Тест завершён!</h2>
-    <p>Ваш результат отправлен на вашу почту.</p>
+    <p class="result-message">Ваш результат отправлен на вашу почту.</p>
     <a href="/tests.html" class="test-btn">К выбору теста</a>
   </div>
   <script src="test.js"></script>
