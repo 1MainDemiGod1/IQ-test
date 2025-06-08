@@ -139,4 +139,24 @@ form h2 {
 }
 p, label, input, button, a {
   font-family: 'Roboto', Arial, sans-serif;
+}
+.form-link {
+  display: block;
+  text-align: center;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #6d4bc3;
+  margin-top: 14px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+.form-link a {
+  color: #4a90e2;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.form-link a:hover {
+  color: #357ab8;
+  text-decoration: underline wavy;
 } 
