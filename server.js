@@ -262,6 +262,18 @@ app.get('/api/questions', (req, res) => {
   res.json(questions.map(q => ({ q: q.q, a: q.a })));
 });
 
+// Маршрут для страницы со всеми тестами
+app.get('/tests', (req, res) => {
+    res.sendFile(path.join(__dirname, 'path/to/tests.html')); // Укажите путь к вашему HTML-файлу с тестами
+});
+
+// Маршрут для страницы результатов
+app.post('/submit-test', (req, res) => {
+    // Логика обработки теста
+    // После обработки отправьте пользователя на страницу результатов
+    res.sendFile(path.join(__dirname, 'path/to/results.html')); // Укажите путь к вашему HTML-файлу с результатами
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Сервер запущен на порту', PORT);

@@ -9,6 +9,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #f4f4f4;
+  color: #333;
+  text-align: center;
+  padding: 50px;
 }
 h1 {
   margin-top: 40px;
@@ -304,4 +308,27 @@ p, label, input, button, a {
   60% { transform: translateX(-8px); }
   80% { transform: translateX(8px); }
   100% { transform: translateX(0); }
+}
+
+.result-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #0056b3;
 } 
