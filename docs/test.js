@@ -5,6 +5,10 @@ if (path.includes('test-math')) {
   api = '/api/questions-math';
   submit = '/submit-math';
 }
+if (path.includes('test-analysis')) {
+  api = '/api/questions-analysis';
+  submit = '/submit-analysis';
+}
 fetch(api)
   .then(res => res.json())
   .then(questions => {
