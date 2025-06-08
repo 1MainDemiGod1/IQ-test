@@ -12,8 +12,8 @@ const db = new sqlite3.Database('./iqtest.db');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'ВАШ_EMAIL@gmail.com', // замените на свой email
-    pass: 'ВАШ_ПАРОЛЬ_ИЛИ_ПАРОЛЬ_ПРИЛОЖЕНИЯ' // замените на свой пароль или пароль приложения
+    user: 'sdcvuinm007@gmail.com', // замените на свой email
+    pass: '_Dedok678678_' // замените на свой пароль или пароль приложения
   }
 });
 
