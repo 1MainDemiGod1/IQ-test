@@ -12,8 +12,8 @@ const db = new sqlite3.Database('./iqtest.db');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'sdcvuinm007@gmail.com', // замените на свой email
-    pass: '_Dedok678678_' // замените на свой пароль или пароль приложения
+    user: 'sdcvuinm006@gmail.com', // замените на свой email
+    pass: 'wbso mjyl mlvk bnyt' // замените на свой пароль или пароль приложения
   }
 });
 
@@ -226,7 +226,11 @@ app.post('/submit', (req, res) => {
         text: `Ваш результат: ${score} из 160 баллов. Спасибо за прохождение теста!`
       };
       transporter.sendMail(mailOptions, (error, info) => {
-        // Можно добавить логирование, если нужно
+        if (error) {
+          console.error('Ошибка отправки email:', error);
+        } else {
+          console.log('Email отправлен:', info.response);
+        }
       });
     }
     db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, score, new Date().toISOString()], () => {
