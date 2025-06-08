@@ -248,7 +248,7 @@ app.post('/submit', (req, res) => {
 
 app.get('/result', (req, res) => {
   if (!req.session.userId) return res.redirect('/');
-  res.sendFile(path.join(__dirname, 'path/to/results.html')); // Убедитесь, что путь правильный
+  res.sendFile(path.join(__dirname, 'docs', 'results.html'));
 });
 
 app.get('/logout', (req, res) => {
@@ -264,13 +264,13 @@ app.get('/api/questions', (req, res) => {
 
 // Маршрут для страницы со всеми тестами
 app.get('/tests', (req, res) => {
-    res.sendFile(path.join(__dirname, 'path/to/tests.html')); // Укажите путь к вашему HTML-файлу с тестами
+  res.sendFile(path.join(__dirname, 'docs', 'tests.html'));
 });
 
 // Маршрут для страницы результатов
 app.post('/submit-test', (req, res) => {
-    // Логика обработки теста
-    res.sendFile(path.join(__dirname, 'path/to/results.html')); // Убедитесь, что путь правильный
+  // Логика обработки теста
+  res.sendFile(path.join(__dirname, 'docs', 'results.html'));
 });
 
 const PORT = process.env.PORT || 3000;
