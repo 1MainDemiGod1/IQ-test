@@ -9,7 +9,7 @@
 <body>
   <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
     <img src="favicon.svg" alt="IQ" style="width:64px;height:64px;margin-bottom:8px;filter:drop-shadow(0 2px 8px #b6aee7);">
-    <h1>IQ-Тест</h1>
+    <h1 id="test-title">IQ-Тест</h1>
   </div>
   <form id="testForm" method="post" action="/submit">
     <div id="question-slider" class="question-slider"></div>
@@ -31,6 +31,25 @@
     if (window.location.pathname === '/result') {
       document.getElementById('testForm').style.display = 'none';
       document.getElementById('test-complete').style.display = 'block';
+    }
+    // Динамический заголовок для разных тестов
+    const titles = {
+      '/test': 'IQ-Тест',
+      '/test-math': 'Практикум по решению математических задач',
+      '/test-analysis': 'Комплексный анализ',
+      '/test-db': 'Основы проектирования ИС и БД',
+      '/test-numerical': 'Методы вычислений',
+      '/test-physmath': 'Уравнения математической физики',
+      '/test-softdev': 'Технология разработки ПО',
+      '/test-modeling': 'Математическое моделирование и анализ данных',
+      '/test-infoman': 'Информационный менеджмент',
+      '/test-worldinfo': 'Мировые информационные ресурсы',
+      '/test-control': 'Теория управления'
+    };
+    const t = titles[window.location.pathname];
+    if (t) {
+      document.getElementById('test-title').textContent = t;
+      document.title = t;
     }
   </script>
 </body>
