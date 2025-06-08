@@ -4,13 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Результаты теста</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Подключите ваш CSS файл -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+      /* Конфетти */
+      .confetti {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        pointer-events: none;
+        z-index: 10;
+      }
+    </style>
 </head>
 <body>
-    <div class="result-container">
-        <h1>Результаты отправлены на почту!</h1>
-        <p>Спасибо за прохождение теста. Вы можете проверить свою почту для получения результатов.</p>
-        <a href="/tests" class="button">Перейти к тестам</a>
-    </div>
+  <canvas class="confetti"></canvas>
+  <div class="result-block">
+    <div class="result-icon" style="font-size:4rem;">🎉</div>
+    <h1>Результаты отправлены на почту!</h1>
+    <p class="result-message">Спасибо за прохождение теста.<br>Проверьте свою почту для получения результатов.</p>
+    <a href="/tests" class="test-btn" style="margin-bottom:10px;">К выбору тестов</a>
+    <br>
+    <a href="/index.html" class="button">На главную</a>
+  </div>
+  <script>
+    // Простая анимация конфетти
+    const canvas = document.querySelector('.confetti');
+    const ctx = canvas.getContext('2d');
+    let W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    let confetti = Array.from({length: 80}, () => ({
+      x: Math.random()*W,
+      y: Math.random()*-H,
+      r: 6+Math.random()*8,
+      d: 2+Math.random()*2,
+      color: `hsl(${Math.random()*360},90%,70%)`,
+      tilt: Math.random()*10-5
+    }));
+    function drawConfetti() {
+      ctx.clearRect(0,0,W,H);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.ellipse(c.x, c.y, c.r, c.r/2, c.tilt, 0, 2*Math.PI);
+        ctx.fillStyle = c.color;
+        ctx.fill();
+      });
+    }
+    function updateConfetti() {
+      confetti.forEach(c => {
+        c.y += c.d;
+        c.x += Math.sin(c.y/30)*2;
+        c.tilt += Math.random()*0.2-0.1;
+        if (c.y > H+20) {
+          c.y = -10; c.x = Math.random()*W;
+        }
+      });
+    }
+    function animate() {
+      drawConfetti();
+      updateConfetti();
+      requestAnimationFrame(animate);
+    }
+    animate();
+    window.addEventListener('resize',()=>{
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = W; canvas.height = H;
+    });
+  </script>
 </body>
 </html>
