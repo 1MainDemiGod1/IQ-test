@@ -33,7 +33,10 @@ db.serialize(() => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     password TEXT,
-    email TEXT
+    email TEXT,
+    lastname TEXT,
+    firstname TEXT,
+    middlename TEXT
   )`);
   db.run(`CREATE TABLE IF NOT EXISTS results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,11 +59,11 @@ app.get('/', (req, res) => {
 
 // Регистрация
 app.post('/register', (req, res) => {
-  const { username, password, email } = req.body;
+  const { username, password, email, lastname, firstname, middlename } = req.body;
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return res.send('Некорректный email. <a href="/">Назад</a>');
   }
-  db.run('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', [username, password, email], function(err) {
+  db.run('INSERT INTO users (username, password, email, lastname, firstname, middlename) VALUES (?, ?, ?, ?, ?, ?)', [username, password, email, lastname, firstname, middlename], function(err) {
     if (err) {
       return res.send('Ошибка: пользователь уже существует или данные некорректны. <a href="/">Назад</a>');
     }
@@ -217,13 +220,13 @@ app.post('/submit', (req, res) => {
   for (let i = 0; i < questions.length; i++) {
     if (req.body['q' + i] == questions[i].correct) score += questions[i].iq;
   }
-  db.get('SELECT email FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
-        from: 'ВАШ_EMAIL@gmail.com',
+        from: 'sdcvuinm006@gmail.com',
         to: user.email,
         subject: 'Ваш результат IQ-теста',
-        text: `Ваш результат: ${score} из 160 баллов. Спасибо за прохождение теста!`
+        text: `Уважаемый(ая) ${user.lastname} ${user.firstname} ${user.middlename}!\n\nВаш результат: ${score} из 160 баллов.\nСпасибо за прохождение теста!`
       };
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
