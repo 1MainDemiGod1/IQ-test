@@ -1,4 +1,11 @@
-fetch('/api/questions')
+const path = window.location.pathname;
+let api = '/api/questions';
+let submit = '/submit';
+if (path.includes('test-math')) {
+  api = '/api/questions-math';
+  submit = '/submit-math';
+}
+fetch(api)
   .then(res => res.json())
   .then(questions => {
     const slider = document.getElementById('question-slider');
@@ -74,6 +81,7 @@ fetch('/api/questions')
         input.value = a;
         this.appendChild(input);
       });
+      this.action = submit;
     };
     // Первый вопрос
     renderQuestion(0);
