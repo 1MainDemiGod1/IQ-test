@@ -22,7 +22,7 @@ resultForm.addEventListener('submit', async e => {
   resultMessage.textContent = 'Отправка...';
 
   try {
-    const resp = await fetch('https://iq-test-einp.onrender.com', {
+    const resp = await fetch('https://iq-test-1.onrender.com', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
