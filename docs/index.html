@@ -15,11 +15,11 @@
   <div id="register-success" style="display:none; text-align:center; color:#2e7d32; font-weight:700; margin-bottom:18px; font-size:1.1rem;">Регистрация прошла успешно! Теперь войдите в свой аккаунт.</div>
   <div id="login-error" style="display:none; text-align:center; color:#d32f2f; font-weight:700; margin-bottom:14px; font-size:1.05rem;"></div>
   <div class="form-container" style="max-width:340px;width:100%;margin:0 auto;">
-    <form action="/login" method="post" autocomplete="off" data-chrome-autocomplete="off">
+    <form action="/login" method="post" autocomplete="off">
       <h2>Вход</h2>
-      <input type="text" name="username_random" placeholder="Логин" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
-      <input type="password" name="password_random" placeholder="Пароль" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off" data-password-policy="no-store"><br>
-      <input type="email" name="email_random" placeholder="Email" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
+      <input type="text" name="username" placeholder="Логин" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
+      <input type="password" name="password" placeholder="Пароль" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
+      <input type="email" name="email" placeholder="Email" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
       <button type="submit">Войти</button>
       <p class="form-link">Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
     </form>
@@ -34,15 +34,6 @@
     if (params.has('error')) {
       document.getElementById('login-error').textContent = decodeURIComponent(params.get('error').replace(/\+/g, ' '));
       document.getElementById('login-error').style.display = 'block';
-    }
-    // Динамически меняем имена полей при загрузке страницы
-    window.onload = function() {
-      const form = document.querySelector('form');
-      const inputs = form.querySelectorAll('input');
-      inputs.forEach(input => {
-        const randomSuffix = Math.random().toString(36).substring(7);
-        input.name = input.name.split('_')[0] + '_' + randomSuffix;
-      });
     }
   </script>
 </body>
