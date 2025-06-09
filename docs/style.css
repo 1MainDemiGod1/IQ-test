@@ -352,4 +352,112 @@ p, label, input, button, a {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  .form-container, .result-block {
+    padding: 18px 8px 18px 8px;
+    max-width: 98vw;
+  }
+  .test-btn, .button, .logout-btn {
+    font-size: 1rem;
+    padding: 10px 8px;
+    min-width: 0;
+    width: 100%;
+  }
+  .question-slider {
+    max-width: 98vw;
+  }
+  .question-title {
+    font-size: 1rem;
+    padding: 8px 6px;
+  }
+}
+
+/* Современный стиль для всех кнопок */
+button, .test-btn, .button, .logout-btn {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+  color: #fff;
+  font-size: 1.15rem;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(80,80,120,0.13);
+  letter-spacing: 1px;
+  padding: 14px 28px;
+  margin: 10px 0;
+  transition: background 0.3s, color 0.2s, box-shadow 0.2s, transform 0.2s, filter 0.2s;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+button:hover, .test-btn:hover, .button:hover, .logout-btn:hover {
+  background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(80,80,120,0.18);
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.08);
+}
+button:active, .test-btn:active, .button:active, .logout-btn:active {
+  filter: brightness(0.95) saturate(1.2);
+  transform: scale(0.98);
+}
+
+/* Современный стиль для форм ввода */
+input[type="text"], input[type="password"], input[type="email"] {
+  border: 2px solid #b6aee7;
+  border-radius: 10px;
+  background: #f9f9fc;
+  padding: 14px 18px;
+  font-size: 1.08rem;
+  font-family: 'Roboto', Arial, sans-serif;
+  margin: 10px 0 18px 0;
+  box-shadow: 0 2px 8px rgba(80,80,120,0.07);
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+  color: #2d2d2d;
+}
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+  border-color: #6a82fb;
+  background: #eef1fb;
+  box-shadow: 0 0 0 2px #6a82fb33;
+}
+
+/* Современный стиль для текста */
+body, h1, h2, h3, h4, h5, h6, p, label, input, button, a {
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+  color: #2d2d2d;
+  letter-spacing: 0.5px;
+}
+h1, h2, h3 {
+  color: #4a90e2;
+  text-shadow: 0 2px 8px rgba(80,80,120,0.10), 0 1px 0 #fff;
+}
+
+/* Улучшение читаемости текста */
+p, label, .form-link, .result-message {
+  font-size: 1.12rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* Улучшение внешнего вида ошибок */
+#register-error, #login-error {
+  background: linear-gradient(90deg, #ffb199 0%, #ff0844 100%);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 10px 0;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(255,88,88,0.10);
+  animation: fadeIn 0.5s;
+}
+
+/* Плавное появление для всех форм и блоков */
+.form-container, .result-block, .question-block, .test-choice {
+  animation: fadeIn 0.7s;
 } 

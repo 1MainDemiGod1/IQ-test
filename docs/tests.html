@@ -25,5 +25,21 @@
     <a href="/test-control" class="test-btn" style="min-width:220px;max-width:320px;width:90%;">Теория управления</a>
   </div>
   <a href="/logout" class="logout-btn">Выйти из аккаунта</a>
+  <script>
+  // Если пользователь не авторизован (сервер не отдаст страницу, но если вдруг она закэширована), проверяем наличие cookie 'token'.
+  // Если токена нет, очищаем историю и редиректим на /
+  (function() {
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    if (!getCookie('token')) {
+      // Очищаем историю и редиректим на главную
+      window.location.replace('/');
+      window.history.pushState(null, '', '/');
+    }
+  })();
+  </script>
 </body>
 </html> 
