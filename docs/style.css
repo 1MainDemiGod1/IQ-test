@@ -97,12 +97,16 @@ button:hover, .test-btn:hover, .button:hover {
   margin: 40px 0;
 }
 .test-btn {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  min-height: 56px;
   padding: 18px 36px;
   background: linear-gradient(90deg, #4a90e2 0%, #8f6ed5 100%);
   color: #fff;
   border-radius: 8px;
-  font-size: 1.3rem;
   text-decoration: none;
   box-shadow: 0 2px 8px rgba(80,80,120,0.10);
   transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
@@ -352,4 +356,62 @@ p, label, input, button, a {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+/* --- Адаптивность для мобильных устройств и планшетов --- */
+@media (max-width: 900px) {
+  .form-container, .result-block, .result-container {
+    max-width: 98vw;
+    padding: 18px 6vw 18px 6vw;
+  }
+  .question-slider {
+    max-width: 98vw;
+    padding: 0 2vw;
+  }
+}
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin-top: 18px;
+  }
+  .form-container, .result-block, .result-container {
+    padding: 10px 2vw 18px 2vw;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(80,80,120,0.08);
+  }
+  form {
+    min-width: 0;
+    width: 100%;
+    max-width: 98vw;
+  }
+  .test-btn, .button, .slider-btn {
+    font-size: 1rem;
+    padding: 10px 0;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .test-choice {
+    flex-direction: column;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .question-title {
+    font-size: 1rem;
+    padding: 8px 8px;
+  }
+  .answers {
+    gap: 10px;
+  }
+  .answer-label {
+    font-size: 0.98rem;
+    padding: 10px 8px;
+  }
+  .logout-btn {
+    font-size: 1rem;
+    padding: 10px 0;
+    margin-top: 18px;
+  }
 } 
