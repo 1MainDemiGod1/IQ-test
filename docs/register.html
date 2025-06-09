@@ -2,18 +2,19 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Регистрация | IQ-Тест</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
-    <img src="favicon.svg" alt="IQ" style="width:64px;height:64px;margin-bottom:8px;filter:drop-shadow(0 2px 8px #b6aee7);">
+  <div class="logo-header">
+    <img src="favicon.svg" alt="IQ" class="logo-img">
     <h1>Регистрация</h1>
   </div>
-  <div class="form-container" style="max-width:340px;width:100%;margin:0 auto;">
+  <div class="form-container">
     <form action="/register" method="post">
-      <div id="register-error" style="display:none; text-align:center; color:#d32f2f; font-weight:700; margin-bottom:14px; font-size:1.05rem;"></div>
+      <div id="register-error" class="login-error"></div>
       <input type="text" name="lastname" placeholder="Фамилия" required autocomplete="family-name"><br>
       <input type="text" name="firstname" placeholder="Имя" required autocomplete="given-name"><br>
       <input type="text" name="middlename" placeholder="Отчество" required autocomplete="additional-name"><br>
