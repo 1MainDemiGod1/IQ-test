@@ -13,14 +13,14 @@
     <h1>Регистрация</h1>
   </div>
   <div class="form-container" style="max-width:340px;width:100%;margin:0 auto;">
-    <form action="/register" method="post" autocomplete="off">
+    <form action="/register" method="post" autocomplete="off" data-chrome-autocomplete="off">
       <div id="register-error" style="display:none; text-align:center; color:#d32f2f; font-weight:700; margin-bottom:14px; font-size:1.05rem;"></div>
-      <input type="text" name="lastname" placeholder="Фамилия" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
-      <input type="text" name="firstname" placeholder="Имя" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
-      <input type="text" name="middlename" placeholder="Отчество" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
-      <input type="text" name="username" placeholder="Логин" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
-      <input type="password" name="password" placeholder="Пароль" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
-      <input type="email" name="email" placeholder="Email" required autocomplete="new-password" data-lpignore="true" data-form-type="other"><br>
+      <input type="text" name="lastname_random" placeholder="Фамилия" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
+      <input type="text" name="firstname_random" placeholder="Имя" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
+      <input type="text" name="middlename_random" placeholder="Отчество" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
+      <input type="text" name="username_random" placeholder="Логин" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
+      <input type="password" name="password_random" placeholder="Пароль" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off" data-password-policy="no-store"><br>
+      <input type="email" name="email_random" placeholder="Email" required autocomplete="chrome-off" data-lpignore="true" data-form-type="other" data-chrome-autocomplete="off"><br>
       <button type="submit">Зарегистрироваться</button>
       <p class="form-link">Уже есть аккаунт? <a href="index.html">Войти</a></p>
     </form>
@@ -31,6 +31,15 @@
     if (params.has('error')) {
       document.getElementById('register-error').textContent = decodeURIComponent(params.get('error').replace(/\+/g, ' '));
       document.getElementById('register-error').style.display = 'block';
+    }
+    // Динамически меняем имена полей при загрузке страницы
+    window.onload = function() {
+      const form = document.querySelector('form');
+      const inputs = form.querySelectorAll('input');
+      inputs.forEach(input => {
+        const randomSuffix = Math.random().toString(36).substring(7);
+        input.name = input.name.split('_')[0] + '_' + randomSuffix;
+      });
     }
   </script>
 </body>
