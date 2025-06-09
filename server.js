@@ -4,9 +4,30 @@ const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const db = new sqlite3.Database('./iqtest.db');
+const JWT_SECRET = 'your-secret-key'; // В продакшене использовать сложный ключ из env
+
+// Middleware для проверки JWT
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1] || req.cookies?.token;
+
+  if (!token) {
+    return res.redirect('/index.html?error=Необходима+авторизация');
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.redirect('/index.html?error=Недействительный+токен');
+    }
+    req.user = user;
+    next();
+  });
+};
 
 // Настройка транспорта для gmail (замените на свои данные)
 const transporter = nodemailer.createTransport({
@@ -19,6 +40,7 @@ const transporter = nodemailer.createTransport({
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('docs'));
+app.use(cookieParser());
 app.use(session({
   secret: 'iqtest_secret',
   resave: false,
@@ -47,6 +69,35 @@ db.serialize(() => {
   )`);
 });
 
+// Обновление существующих паролей
+db.serialize(async () => {
+  try {
+    // Получаем всех пользователей
+    const users = await new Promise((resolve, reject) => {
+      db.all('SELECT id, password FROM users', [], (err, rows) => {
+        if (err) reject(err);
+        resolve(rows);
+      });
+    });
+
+    // Хешируем пароли для каждого пользователя
+    for (const user of users) {
+      if (!user.password.startsWith('$2')) { // Проверяем, не хеширован ли уже пароль
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        await new Promise((resolve, reject) => {
+          db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, user.id], (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
+      }
+    }
+    console.log('Пароли успешно обновлены');
+  } catch (error) {
+    console.error('Ошибка при обновлении паролей:', error);
+  }
+});
+
 // Маршруты
 // Главная страница
 app.get('/', (req, res) => {
@@ -58,35 +109,92 @@ app.get('/', (req, res) => {
 });
 
 // Регистрация
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const { username, password, email, lastname, firstname, middlename } = req.body;
+  
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return res.redirect('/register.html?error=Некорректный+email');
   }
-  db.get('SELECT id FROM users WHERE email = ?', [email], (err, row) => {
-    if (row) {
+
+  try {
+    // Проверка существующего email
+    const emailExists = await new Promise((resolve, reject) => {
+      db.get('SELECT id FROM users WHERE email = ?', [email], (err, row) => {
+        if (err) reject(err);
+        resolve(row);
+      });
+    });
+
+    if (emailExists) {
       return res.redirect('/register.html?error=Пользователь+с+таким+email+уже+существует');
     }
-    db.run('INSERT INTO users (username, password, email, lastname, firstname, middlename) VALUES (?, ?, ?, ?, ?, ?)', [username, password, email, lastname, firstname, middlename], function(err) {
-      if (err) {
-        return res.redirect('/register.html?error=Пользователь+с+таким+логином+уже+существует');
-      }
-      res.redirect('/index.html?registered=1');
+
+    // Хеширование пароля
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Сохранение пользователя
+    await new Promise((resolve, reject) => {
+      db.run(
+        'INSERT INTO users (username, password, email, lastname, firstname, middlename) VALUES (?, ?, ?, ?, ?, ?)',
+        [username, hashedPassword, email, lastname, firstname, middlename],
+        function(err) {
+          if (err) reject(err);
+          resolve(this.lastID);
+        }
+      );
     });
-  });
+
+    res.redirect('/index.html?registered=1');
+  } catch (error) {
+    res.redirect('/register.html?error=Ошибка+регистрации');
+  }
 });
 
 // Вход
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  db.get('SELECT id FROM users WHERE username = ? AND password = ?', [username, password], (err, row) => {
-    if (row) {
-      req.session.userId = row.id;
-      res.redirect('/tests.html');
-    } else {
-      res.redirect('/index.html?error=Неверный+логин+или+пароль');
+
+  try {
+    // Поиск пользователя
+    const user = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+        if (err) reject(err);
+        resolve(row);
+      });
+    });
+
+    if (!user) {
+      return res.redirect('/index.html?error=Неверный+логин+или+пароль');
     }
-  });
+
+    // Проверка пароля
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.redirect('/index.html?error=Неверный+логин+или+пароль');
+    }
+
+    // Создание JWT токена
+    const token = jwt.sign(
+      { 
+        id: user.id, 
+        username: user.username,
+        email: user.email 
+      }, 
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // Установка токена в cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000 // 24 часа
+    });
+
+    res.redirect('/tests.html');
+  } catch (error) {
+    res.redirect('/index.html?error=Ошибка+входа');
+  }
 });
 
 // Вопросы для IQ-теста (оставить как есть)
@@ -1253,18 +1361,16 @@ const questionsControl = [
   }
 ];
 
-app.get('/test', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
-app.post('/submit', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit', authenticateToken, (req, res) => {
   let score = 0;
   for (let i = 0; i < questions.length; i++) {
     if (req.body['q' + i] == questions[i].correct) score += questions[i].iq;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1280,58 +1386,54 @@ app.post('/submit', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, score, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, score, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
-app.get('/result', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/result', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'results.html'));
 });
 
 app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/');
-  });
+  res.clearCookie('token');
+  res.redirect('/index.html');
 });
 
 // Для фронта вопросы (AJAX)
-app.get('/api/questions', (req, res) => {
+app.get('/api/questions', authenticateToken, (req, res) => {
   res.json(questions.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Маршрут для страницы со всеми тестами
-app.get('/tests', (req, res) => {
+app.get('/tests', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'tests.html'));
 });
 
 // Маршрут для страницы результатов
-app.post('/submit-test', (req, res) => {
+app.post('/submit-test', authenticateToken, (req, res) => {
   // Логика обработки теста
   res.sendFile(path.join(__dirname, 'docs', 'results.html'));
 });
 
 // Маршрут для страницы теста по математике
-app.get('/test-math', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-math', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по математике
-app.get('/api/questions-math', (req, res) => {
+app.get('/api/questions-math', authenticateToken, (req, res) => {
   res.json(questionsMath.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по математике
-app.post('/submit-math', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-math', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsMath.length; i++) {
     if (req.body['q' + i] == questionsMath[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1348,31 +1450,29 @@ app.post('/submit-math', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по комплексному анализу
-app.get('/test-analysis', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-analysis', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по комплексному анализу
-app.get('/api/questions-analysis', (req, res) => {
+app.get('/api/questions-analysis', authenticateToken, (req, res) => {
   res.json(questionsAnalysis.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по комплексному анализу
-app.post('/submit-analysis', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-analysis', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsAnalysis.length; i++) {
     if (req.body['q' + i] == questionsAnalysis[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1388,31 +1488,29 @@ app.post('/submit-analysis', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по ИС и БД
-app.get('/test-db', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-db', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по ИС и БД
-app.get('/api/questions-db', (req, res) => {
+app.get('/api/questions-db', authenticateToken, (req, res) => {
   res.json(questionsDB.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по ИС и БД
-app.post('/submit-db', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-db', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsDB.length; i++) {
     if (req.body['q' + i] == questionsDB[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1428,31 +1526,29 @@ app.post('/submit-db', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по методам вычислений
-app.get('/test-numerical', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-numerical', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по методам вычислений
-app.get('/api/questions-numerical', (req, res) => {
+app.get('/api/questions-numerical', authenticateToken, (req, res) => {
   res.json(questionsNumerical.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по методам вычислений
-app.post('/submit-numerical', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-numerical', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsNumerical.length; i++) {
     if (req.body['q' + i] == questionsNumerical[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1468,31 +1564,29 @@ app.post('/submit-numerical', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по уравнениям математической физики
-app.get('/test-physmath', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-physmath', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по уравнениям математической физики
-app.get('/api/questions-physmath', (req, res) => {
+app.get('/api/questions-physmath', authenticateToken, (req, res) => {
   res.json(questionsPhysMath.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по уравнениям математической физики
-app.post('/submit-physmath', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-physmath', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsPhysMath.length; i++) {
     if (req.body['q' + i] == questionsPhysMath[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1508,31 +1602,29 @@ app.post('/submit-physmath', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по технологии разработки ПО
-app.get('/test-softdev', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-softdev', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по технологии разработки ПО
-app.get('/api/questions-softdev', (req, res) => {
+app.get('/api/questions-softdev', authenticateToken, (req, res) => {
   res.json(questionsSoftDev.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по технологии разработки ПО
-app.post('/submit-softdev', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-softdev', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsSoftDev.length; i++) {
     if (req.body['q' + i] == questionsSoftDev[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1548,31 +1640,29 @@ app.post('/submit-softdev', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по математическому моделированию и анализу данных
-app.get('/test-modeling', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-modeling', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по математическому моделированию и анализу данных
-app.get('/api/questions-modeling', (req, res) => {
+app.get('/api/questions-modeling', authenticateToken, (req, res) => {
   res.json(questionsModeling.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по математическому моделированию и анализу данных
-app.post('/submit-modeling', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-modeling', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsModeling.length; i++) {
     if (req.body['q' + i] == questionsModeling[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1588,31 +1678,29 @@ app.post('/submit-modeling', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по информационному менеджменту
-app.get('/test-infoman', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-infoman', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по информационному менеджменту
-app.get('/api/questions-infoman', (req, res) => {
+app.get('/api/questions-infoman', authenticateToken, (req, res) => {
   res.json(questionsInfoMan.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по информационному менеджменту
-app.post('/submit-infoman', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-infoman', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsInfoMan.length; i++) {
     if (req.body['q' + i] == questionsInfoMan[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1628,31 +1716,29 @@ app.post('/submit-infoman', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по мировым информационным ресурсам
-app.get('/test-worldinfo', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-worldinfo', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по мировым информационным ресурсам
-app.get('/api/questions-worldinfo', (req, res) => {
+app.get('/api/questions-worldinfo', authenticateToken, (req, res) => {
   res.json(questionsWorldInfo.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по мировым информационным ресурсам
-app.post('/submit-worldinfo', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-worldinfo', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsWorldInfo.length; i++) {
     if (req.body['q' + i] == questionsWorldInfo[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1668,31 +1754,29 @@ app.post('/submit-worldinfo', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });
 });
 
 // Маршрут для страницы теста по теории управления
-app.get('/test-control', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.get('/test-control', authenticateToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
 // API для вопросов по теории управления
-app.get('/api/questions-control', (req, res) => {
+app.get('/api/questions-control', authenticateToken, (req, res) => {
   res.json(questionsControl.map(q => ({ q: q.q, a: q.a })));
 });
 
 // Обработка отправки результатов по теории управления
-app.post('/submit-control', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
+app.post('/submit-control', authenticateToken, (req, res) => {
   let correctCount = 0;
   for (let i = 0; i < questionsControl.length; i++) {
     if (req.body['q' + i] == questionsControl[i].correct) correctCount++;
   }
-  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.session.userId], (err, user) => {
+  db.get('SELECT email, lastname, firstname, middlename FROM users WHERE id = ?', [req.user.id], (err, user) => {
     if (user && user.email) {
       const mailOptions = {
         from: 'sdcvuinm006@gmail.com',
@@ -1708,7 +1792,7 @@ app.post('/submit-control', (req, res) => {
         }
       });
     }
-    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.session.userId, correctCount, new Date().toISOString()], () => {
+    db.run('INSERT INTO results (user_id, score, date) VALUES (?, ?, ?)', [req.user.id, correctCount, new Date().toISOString()], () => {
       res.redirect('/result');
     });
   });

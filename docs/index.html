@@ -35,6 +35,44 @@
       document.getElementById('login-error').textContent = decodeURIComponent(params.get('error').replace(/\+/g, ' '));
       document.getElementById('login-error').style.display = 'block';
     }
+
+    // Функция для проверки JWT токена
+    function checkAuth() {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+      if (token) {
+        window.location.href = '/tests.html';
+      }
+    }
+
+    // Проверяем авторизацию при загрузке страницы
+    checkAuth();
+
+    // Обработка отправки формы
+    document.querySelector('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams(formData),
+        });
+        
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          const data = await response.json();
+          if (data.error) {
+            document.getElementById('login-error').textContent = data.error;
+            document.getElementById('login-error').style.display = 'block';
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
   </script>
 </body>
 </html> 
