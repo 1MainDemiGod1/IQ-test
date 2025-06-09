@@ -9,6 +9,38 @@ if (path.includes('test-analysis')) {
   api = '/api/questions-analysis';
   submit = '/submit-analysis';
 }
+if (path.includes('test-db')) {
+  api = '/api/questions-db';
+  submit = '/submit-db';
+}
+if (path.includes('test-numerical')) {
+  api = '/api/questions-numerical';
+  submit = '/submit-numerical';
+}
+if (path.includes('test-physmath')) {
+  api = '/api/questions-physmath';
+  submit = '/submit-physmath';
+}
+if (path.includes('test-softdev')) {
+  api = '/api/questions-softdev';
+  submit = '/submit-softdev';
+}
+if (path.includes('test-modeling')) {
+  api = '/api/questions-modeling';
+  submit = '/submit-modeling';
+}
+if (path.includes('test-infoman')) {
+  api = '/api/questions-infoman';
+  submit = '/submit-infoman';
+}
+if (path.includes('test-worldinfo')) {
+  api = '/api/questions-worldinfo';
+  submit = '/submit-worldinfo';
+}
+if (path.includes('test-control')) {
+  api = '/api/questions-control';
+  submit = '/submit-control';
+}
 fetch(api)
   .then(res => res.json())
   .then(questions => {
