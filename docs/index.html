@@ -16,8 +16,9 @@
   <div class="form-container" style="max-width:340px;width:100%;margin:0 auto;">
     <form action="/login" method="post">
       <h2>Вход</h2>
-      <input type="text" name="username" placeholder="Логин" required><br>
-      <input type="password" name="password" placeholder="Пароль" required><br>
+      <input type="text" name="username" placeholder="Логин" required autocomplete="username"><br>
+      <input type="password" name="password" placeholder="Пароль" required autocomplete="current-password"><br>
+      <input type="email" name="email" placeholder="Email" required autocomplete="email"><br>
       <button type="submit">Войти</button>
       <p class="form-link">Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
     </form>

@@ -14,12 +14,12 @@
   <div class="form-container" style="max-width:340px;width:100%;margin:0 auto;">
     <form action="/register" method="post">
       <div id="register-error" style="display:none; text-align:center; color:#d32f2f; font-weight:700; margin-bottom:14px; font-size:1.05rem;"></div>
-      <input type="text" name="lastname" placeholder="Фамилия" required><br>
-      <input type="text" name="firstname" placeholder="Имя" required><br>
-      <input type="text" name="middlename" placeholder="Отчество" required><br>
-      <input type="text" name="username" placeholder="Логин" required><br>
-      <input type="password" name="password" placeholder="Пароль" required><br>
-      <input type="email" name="email" placeholder="Email" required><br>
+      <input type="text" name="lastname" placeholder="Фамилия" required autocomplete="family-name"><br>
+      <input type="text" name="firstname" placeholder="Имя" required autocomplete="given-name"><br>
+      <input type="text" name="middlename" placeholder="Отчество" required autocomplete="additional-name"><br>
+      <input type="text" name="username" placeholder="Логин" required autocomplete="username"><br>
+      <input type="password" name="password" placeholder="Пароль" required autocomplete="new-password"><br>
+      <input type="email" name="email" placeholder="Email" required autocomplete="email"><br>
       <button type="submit">Зарегистрироваться</button>
       <p class="form-link">Уже есть аккаунт? <a href="index.html">Войти</a></p>
     </form>
