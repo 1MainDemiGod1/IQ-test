@@ -87,7 +87,7 @@ app.post('/login', (req, res) => {
       // Генерируем JWT
       const token = jwt.sign({ userId: row.id }, 'your_jwt_secret_key', { expiresIn: '2h' });
       // Отправляем токен в cookie
-      res.cookie('token', token, { httpOnly: true });
+      res.cookie('token', token, { httpOnly: true, path: '/', sameSite: 'lax' });
       res.redirect('/tests.html');
     } else {
       res.redirect('/index.html?error=Неверный+логин+или+пароль');
