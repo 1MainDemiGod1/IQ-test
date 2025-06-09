@@ -1271,7 +1271,6 @@ function authenticateJWT(req, res, next) {
 }
 
 app.get('/test', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1303,7 +1302,6 @@ app.post('/submit', authenticateJWT, (req, res) => {
 });
 
 app.get('/result', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'results.html'));
 });
 
@@ -1330,7 +1328,6 @@ app.post('/submit-test', (req, res) => {
 
 // Маршрут для страницы теста по математике
 app.get('/test-math', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1370,7 +1367,6 @@ app.post('/submit-math', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по комплексному анализу
 app.get('/test-analysis', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1409,7 +1405,6 @@ app.post('/submit-analysis', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по ИС и БД
 app.get('/test-db', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1448,7 +1443,6 @@ app.post('/submit-db', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по методам вычислений
 app.get('/test-numerical', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1487,7 +1481,6 @@ app.post('/submit-numerical', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по уравнениям математической физики
 app.get('/test-physmath', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1526,7 +1519,6 @@ app.post('/submit-physmath', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по технологии разработки ПО
 app.get('/test-softdev', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1565,7 +1557,6 @@ app.post('/submit-softdev', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по математическому моделированию и анализу данных
 app.get('/test-modeling', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1604,7 +1595,6 @@ app.post('/submit-modeling', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по информационному менеджменту
 app.get('/test-infoman', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1643,7 +1633,6 @@ app.post('/submit-infoman', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по мировым информационным ресурсам
 app.get('/test-worldinfo', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
@@ -1682,7 +1671,6 @@ app.post('/submit-worldinfo', authenticateJWT, (req, res) => {
 
 // Маршрут для страницы теста по теории управления
 app.get('/test-control', (req, res) => {
-  if (!req.session.userId) return res.redirect('/');
   res.sendFile(path.join(__dirname, 'docs', 'test.html'));
 });
 
