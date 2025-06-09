@@ -2,14 +2,13 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IQ-Тест</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
-  <div class="logo-header">
-    <img src="favicon.svg" alt="IQ" class="logo-img">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+    <img src="favicon.svg" alt="IQ" style="width:64px;height:64px;margin-bottom:8px;filter:drop-shadow(0 2px 8px #b6aee7);">
     <h1 id="test-title">IQ-Тест</h1>
   </div>
   <form id="testForm" method="post" action="/submit">
@@ -20,7 +19,7 @@
       <button type="submit" id="finishBtn" class="slider-btn" style="display:none;">Завершить тест</button>
     </div>
   </form>
-  <div id="test-complete" class="result-block result-block-complete">
+  <div id="test-complete" class="result-block" style="display:none; text-align:center; margin-top:40px;">
     <div class="result-icon">📧</div>
     <h2>Тест завершён!</h2>
     <p class="result-message">Ваш результат отправлен на вашу почту.</p>
